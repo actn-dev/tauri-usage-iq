@@ -1,6 +1,8 @@
-import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 import { invoke } from "@tauri-apps/api/core";
+import { useEffect, useState } from "react";
 import "./App.css";
+import { Login } from "./components/login";
 
 interface AppUsageSummary {
   app_name: string;
@@ -71,7 +73,11 @@ function App() {
   return (
     <main className="container">
       <h1>Usage IQ - Activity Tracker</h1>
+
       <p>Real-time application usage tracking</p>
+      <div className="flex min-h-svh bg-red-200 flex-col items-center justify-center">
+      <Login />
+    </div>
 
       <div style={{ marginTop: "1rem", display: "flex", gap: "1rem" }}>
         <button onClick={() => setShowDebug(!showDebug)}>
