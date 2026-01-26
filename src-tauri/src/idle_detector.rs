@@ -29,7 +29,7 @@ fn get_windows_idle_seconds() -> u64 {
             dwTime: 0,
         };
         
-        if GetLastInputInfo(&mut last_input).is_ok() {
+        if GetLastInputInfo(&mut last_input).as_bool() {
             let tick_count = GetTickCount();
             let idle_ms = tick_count - last_input.dwTime;
             (idle_ms / 1000) as u64

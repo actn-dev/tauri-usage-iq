@@ -62,10 +62,6 @@ pub async fn get_app_usage_summary(
     days: Option<i32>,
 ) -> Result<Vec<AppUsageSummary>, String> {
     let days = days.unwrap_or(7);
-    let now = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .unwrap()
-        .as_secs() as i64;
     let cutoff_date = get_date_n_days_ago(days);
     
     let activities = read_hourly_activities(&app);

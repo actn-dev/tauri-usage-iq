@@ -243,8 +243,6 @@ impl ActivityTracker {
         
         // Merge with existing (update or append)
         for new_activity in activities {
-            let key = format!("{}:{}:{}", new_activity.date, new_activity.hour, new_activity.app_name);
-            
             if let Some(existing) = all_activities.iter_mut().find(|a| {
                 a.date == new_activity.date
                     && a.hour == new_activity.hour
