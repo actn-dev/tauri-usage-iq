@@ -41,15 +41,25 @@ fn get_windows_idle_seconds() -> u64 {
 
 #[cfg(target_os = "macos")]
 fn get_macos_idle_seconds() -> u64 {
-    use core_graphics::event_source::{CGEventSource, CGEventSourceStateID};
     use core_graphics::event::CGEventType;
     
-    let idle_seconds = CGEventSource::seconds_since_last_event_type(
-        CGEventSourceStateID::CombinedSessionState,
-        CGEventType::Null,
-    );
+    // CGEventSourceSecondsSinceLastEventType is not exposed in core-graphics crate
+    // We need to call it via FFI
+    #[link(name = "CoreGraphics", kind = "framework")]
+    extern "C" {
+        fn CGEventSourceSecondsSinceLastEventType(
+            source_state_id: u32,
+            event_type: u32,
+        ) -> f64;
+    }
     
-    idle_seconds as u64
+    unsafe {
+        let seconds = CGEventSourceSecondsSinceLastEventType(
+            1, // kCGEventSourceStateCombinedSessionState
+            u32::MAX, // kCGAnyInputEventType
+        );
+        seconds as u64
+    }
 }
 
 /// Check if system is currently idle based on threshold
