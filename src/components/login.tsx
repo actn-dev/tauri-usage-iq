@@ -144,7 +144,7 @@ export function Login() {
         <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-8">
             <div className="text-center mb-6">
                 <h2 className="text-2xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                    Sign in to Usage IQ
+                    Sign in to Dilly
                 </h2>
                 <p className="text-sm text-slate-400">
                     Sign in to sync your activity data to your organization.

@@ -99,7 +99,7 @@ export function Sidebar({
       {/* Header - Fixed */}
       <div className="p-4 border-b border-slate-700 flex-shrink-0">
         <h1 className="text-xl font-bold mb-1 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-          Usage IQ
+          Dilly
         </h1>
         <p className="text-slate-400 text-xs">Desktop Activity Tracker</p>
         {activeOrganization && (

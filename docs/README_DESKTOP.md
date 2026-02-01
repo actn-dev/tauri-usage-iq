@@ -1,4 +1,4 @@
-# 🖥️ Usage IQ - Desktop Activity Tracker
+# 🖥️ Dilly - Desktop Activity Tracker
 
 > Beautiful desktop application to track your computer usage with idle detection and real-time analytics.
 
@@ -165,7 +165,7 @@ cargo test --manifest-path src-tauri/Cargo.toml
 
 ## 🤝 Contributing
 
-This is part of the UsageIQ platform for tracking browser + desktop usage.
+This is part of the Dilly platform for tracking browser + desktop usage.
 
 ## 📄 License
 
