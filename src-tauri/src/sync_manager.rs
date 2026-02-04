@@ -3,7 +3,7 @@ use std::fs;
 use std::path::PathBuf;
 use tauri::{AppHandle, Manager};
 
-use crate::activity_tracker::{HourlyActivity, BrowserSession};
+use crate::activity_tracker::{BrowserSession, HourlyActivity};
 
 const API_BASE_URL: &str = "http://localhost:3000";
 
@@ -104,11 +104,11 @@ fn get_sessions_path(app: &AppHandle) -> PathBuf {
 
 fn read_hourly_activities(app: &AppHandle) -> Vec<HourlyActivity> {
     let path = get_hourly_activities_path(app);
-    
+
     if !path.exists() {
         return Vec::new();
     }
-    
+
     fs::read_to_string(&path)
         .ok()
         .and_then(|content| serde_json::from_str(&content).ok())
@@ -117,11 +117,11 @@ fn read_hourly_activities(app: &AppHandle) -> Vec<HourlyActivity> {
 
 fn read_sessions(app: &AppHandle) -> Vec<BrowserSession> {
     let path = get_sessions_path(app);
-    
+
     if !path.exists() {
         return Vec::new();
     }
-    
+
     fs::read_to_string(&path)
         .ok()
         .and_then(|content| serde_json::from_str(&content).ok())
@@ -137,7 +137,7 @@ pub async fn sync_activities(
     // Read activities and sessions from disk
     let activities = read_hourly_activities(&app);
     let sessions = read_sessions(&app);
-    
+
     if activities.is_empty() && sessions.is_empty() {
         return Ok(SyncResult {
             success: true,
@@ -149,7 +149,7 @@ pub async fn sync_activities(
             duration: 0,
         });
     }
-    
+
     // Transform to API format
     let activity_payloads: Vec<ActivityPayload> = activities
         .into_iter()
@@ -172,7 +172,7 @@ pub async fn sync_activities(
             os_version: Some(a.os_version),
         })
         .collect();
-    
+
     let session_payloads: Vec<SessionPayload> = sessions
         .into_iter()
         .map(|s| SessionPayload {
@@ -190,37 +190,46 @@ pub async fn sync_activities(
             os_version: None,
         })
         .collect();
-    
+
     let request_body = SyncRequest {
         organization_id,
         activities: activity_payloads,
         sessions: session_payloads,
     };
-    
+
     // Make HTTP request
     let client = reqwest::Client::new();
     let url = format!("{}/api/desktop/sync", API_BASE_URL);
-    
+
     let response = client
         .post(&url)
         .header("Content-Type", "application/json")
-        .header("Cookie", format!("better-auth.session_token={}", session_token))
+        .header(
+            "Cookie",
+            format!("better-auth.session_token={}", session_token),
+        )
         .json(&request_body)
         .send()
         .await
         .map_err(|e| format!("Failed to send request: {}", e))?;
-    
+
     let status = response.status();
-    
+
     if !status.is_success() {
-        let error_text = response.text().await.unwrap_or_else(|_| "Unknown error".to_string());
-        return Err(format!("Sync failed with status {}: {}", status, error_text));
+        let error_text = response
+            .text()
+            .await
+            .unwrap_or_else(|_| "Unknown error".to_string());
+        return Err(format!(
+            "Sync failed with status {}: {}",
+            status, error_text
+        ));
     }
-    
+
     let result: SyncResult = response
         .json()
         .await
         .map_err(|e| format!("Failed to parse response: {}", e))?;
-    
+
     Ok(result)
 }

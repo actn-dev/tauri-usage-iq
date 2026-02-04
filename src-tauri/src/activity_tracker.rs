@@ -1,4 +1,5 @@
 use active_win_pos_rs::get_active_window;
+use chrono::{DateTime, Timelike, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
@@ -6,7 +7,6 @@ use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
 use tauri::{AppHandle, Manager};
-use chrono::{DateTime, Timelike, Utc};
 
 use crate::device_manager::{get_or_create_device_info, DeviceInfo};
 use crate::idle_detector::get_system_idle_seconds;
@@ -16,18 +16,18 @@ const FLUSH_INTERVAL_SECONDS: i64 = 300; // Flush to disk every 5 minutes
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct HourlyActivity {
-    pub date: String,           // YYYY-MM-DD
-    pub hour: u8,              // 0-23
+    pub date: String, // YYYY-MM-DD
+    pub hour: u8,     // 0-23
     pub app_name: String,
     pub process_path: String,
-    pub active_time: i64,      // Seconds actively using
-    pub idle_time: i64,        // Seconds idle while app focused
-    pub total_time: i64,       // active_time + idle_time
-    pub focus_count: i32,      // Number of times app was focused
+    pub active_time: i64,           // Seconds actively using
+    pub idle_time: i64,             // Seconds idle while app focused
+    pub total_time: i64,            // active_time + idle_time
+    pub focus_count: i32,           // Number of times app was focused
     pub window_titles: Vec<String>, // Unique window titles seen
-    pub first_seen: i64,       // Unix timestamp
-    pub last_seen: i64,        // Unix timestamp
-    
+    pub first_seen: i64,            // Unix timestamp
+    pub last_seen: i64,             // Unix timestamp
+
     // Device info
     pub device_id: String,
     pub device_name: String,
@@ -67,7 +67,7 @@ pub struct ActivityTracker {
 impl ActivityTracker {
     pub fn new(app: &AppHandle) -> Self {
         let device_info = get_or_create_device_info(app);
-        
+
         // Start a new session
         let session = BrowserSession {
             session_id: uuid::Uuid::new_v4().to_string(),
@@ -80,7 +80,7 @@ impl ActivityTracker {
             app_count: 0,
             app_switch_count: 0,
         };
-        
+
         Self {
             current_activity: Arc::new(Mutex::new(None)),
             hourly_buffer: Arc::new(Mutex::new(HashMap::new())),
@@ -89,53 +89,47 @@ impl ActivityTracker {
             last_flush_time: Arc::new(Mutex::new(current_timestamp())),
         }
     }
-    
+
     pub async fn start_tracking(self, app: AppHandle) {
         let tracker = Arc::new(self);
-        
+
         tokio::spawn(async move {
             let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(1));
-            
+
             loop {
                 interval.tick().await;
                 tracker.track_tick(&app).await;
             }
         });
     }
-    
+
     async fn track_tick(&self, app: &AppHandle) {
         let now = current_timestamp();
         let idle_seconds = get_system_idle_seconds();
         let is_idle = idle_seconds >= IDLE_THRESHOLD_SECONDS;
-        
+
         match get_active_window() {
             Ok(active_window) => {
                 let app_name = active_window.app_name;
                 let process_path = active_window.process_path.to_string_lossy().to_string();
                 let window_title = active_window.title;
-                
+
                 // Update hourly activity
-                self.update_hourly_activity(
-                    &app_name,
-                    &process_path,
-                    &window_title,
-                    now,
-                    is_idle,
-                );
-                
+                self.update_hourly_activity(&app_name, &process_path, &window_title, now, is_idle);
+
                 // Update current activity tracking
                 let mut current = self.current_activity.lock().unwrap();
                 let is_new_app = match current.as_ref() {
                     Some(activity) => activity.app_name != app_name,
                     None => true,
                 };
-                
+
                 if is_new_app {
                     // Update session app switch count
                     if let Some(ref mut session) = *self.session.lock().unwrap() {
                         session.app_switch_count += 1;
                     }
-                    
+
                     *current = Some(CurrentActivity {
                         app_name,
                         process_path,
@@ -143,7 +137,7 @@ impl ActivityTracker {
                         start_time: now,
                     });
                 }
-                
+
                 // Update session time
                 if let Some(ref mut session) = *self.session.lock().unwrap() {
                     if is_idle {
@@ -158,7 +152,7 @@ impl ActivityTracker {
                 // No active window - system might be locked
             }
         }
-        
+
         // Flush to disk periodically
         let mut last_flush = self.last_flush_time.lock().unwrap();
         if now - *last_flush >= FLUSH_INTERVAL_SECONDS {
@@ -166,7 +160,7 @@ impl ActivityTracker {
             *last_flush = now;
         }
     }
-    
+
     fn update_hourly_activity(
         &self,
         app_name: &str,
@@ -178,9 +172,9 @@ impl ActivityTracker {
         let date = timestamp_to_date(timestamp);
         let hour = timestamp_to_hour(timestamp);
         let key = format!("{}:{}:{}", date, hour, app_name);
-        
+
         let mut buffer = self.hourly_buffer.lock().unwrap();
-        
+
         let activity = buffer.entry(key).or_insert_with(|| HourlyActivity {
             date: date.clone(),
             hour,
@@ -198,7 +192,7 @@ impl ActivityTracker {
             os_name: self.device_info.os_name.clone(),
             os_version: self.device_info.os_version.clone(),
         });
-        
+
         // Update times
         if is_idle {
             activity.idle_time += 1;
@@ -207,30 +201,30 @@ impl ActivityTracker {
         }
         activity.total_time += 1;
         activity.last_seen = timestamp;
-        
+
         // Add window title if new
         if !activity.window_titles.contains(&window_title.to_string()) {
             activity.window_titles.push(window_title.to_string());
         }
     }
-    
+
     fn flush_to_disk(&self, app: &AppHandle) {
         let buffer = self.hourly_buffer.lock().unwrap();
-        
+
         if buffer.is_empty() {
             return;
         }
-        
+
         let activities: Vec<HourlyActivity> = buffer.values().cloned().collect();
-        
+
         // Save to file
         let path = get_hourly_activities_path(app);
-        
+
         // Ensure directory exists
         if let Some(parent) = path.parent() {
             let _ = fs::create_dir_all(parent);
         }
-        
+
         // Load existing activities
         let mut all_activities: Vec<HourlyActivity> = if path.exists() {
             fs::read_to_string(&path)
@@ -240,7 +234,7 @@ impl ActivityTracker {
         } else {
             Vec::new()
         };
-        
+
         // Merge with existing (update or append)
         for new_activity in activities {
             if let Some(existing) = all_activities.iter_mut().find(|a| {
@@ -255,7 +249,7 @@ impl ActivityTracker {
                 existing.total_time += new_activity.total_time;
                 existing.focus_count += new_activity.focus_count;
                 existing.last_seen = new_activity.last_seen;
-                
+
                 // Merge window titles
                 for title in new_activity.window_titles {
                     if !existing.window_titles.contains(&title) {
@@ -267,30 +261,30 @@ impl ActivityTracker {
                 all_activities.push(new_activity);
             }
         }
-        
+
         // Write back
         if let Ok(json) = serde_json::to_string_pretty(&all_activities) {
             let _ = fs::write(&path, json);
         }
-        
+
         println!("Flushed {} hourly activities to disk", buffer.len());
     }
-    
+
     pub fn end_session(&self, app: &AppHandle) {
         // Flush remaining data
         self.flush_to_disk(app);
-        
+
         // End session
         if let Some(ref mut session) = *self.session.lock().unwrap() {
             session.end_time = Some(current_timestamp());
-            
+
             // Save session to disk
             let path = get_sessions_path(app);
-            
+
             if let Some(parent) = path.parent() {
                 let _ = fs::create_dir_all(parent);
             }
-            
+
             let mut sessions: Vec<BrowserSession> = if path.exists() {
                 fs::read_to_string(&path)
                     .ok()
@@ -299,9 +293,9 @@ impl ActivityTracker {
             } else {
                 Vec::new()
             };
-            
+
             sessions.push(session.clone());
-            
+
             if let Ok(json) = serde_json::to_string_pretty(&sessions) {
                 let _ = fs::write(&path, json);
             }

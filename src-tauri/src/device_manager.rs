@@ -22,7 +22,7 @@ fn get_device_info_path(app: &AppHandle) -> PathBuf {
 /// Get or create device info (persisted)
 pub fn get_or_create_device_info(app: &AppHandle) -> DeviceInfo {
     let path = get_device_info_path(app);
-    
+
     // Try to load existing device info
     if path.exists() {
         if let Ok(content) = fs::read_to_string(&path) {
@@ -31,7 +31,7 @@ pub fn get_or_create_device_info(app: &AppHandle) -> DeviceInfo {
             }
         }
     }
-    
+
     // Create new device info
     let device_info = DeviceInfo {
         device_id: Uuid::new_v4().to_string(),
@@ -39,17 +39,17 @@ pub fn get_or_create_device_info(app: &AppHandle) -> DeviceInfo {
         os_name: std::env::consts::OS.to_string(),
         os_version: get_os_version(),
     };
-    
+
     // Ensure directory exists
     if let Some(parent) = path.parent() {
         let _ = fs::create_dir_all(parent);
     }
-    
+
     // Save device info
     if let Ok(json) = serde_json::to_string_pretty(&device_info) {
         let _ = fs::write(&path, json);
     }
-    
+
     device_info
 }
 
@@ -58,7 +58,7 @@ fn get_device_name() -> String {
     {
         std::env::var("COMPUTERNAME").unwrap_or_else(|_| "Unknown".to_string())
     }
-    
+
     #[cfg(target_os = "macos")]
     {
         std::env::var("HOSTNAME").unwrap_or_else(|_| {
@@ -68,7 +68,7 @@ fn get_device_name() -> String {
                 .unwrap_or_else(|| "Unknown".to_string())
         })
     }
-    
+
     #[cfg(not(any(target_os = "windows", target_os = "macos")))]
     {
         "Unknown".to_string()
@@ -81,13 +81,13 @@ fn get_os_version() -> String {
         // Get Windows version
         "Windows".to_string() // Simplified
     }
-    
+
     #[cfg(target_os = "macos")]
     {
         // Get macOS version
         "macOS".to_string() // Simplified
     }
-    
+
     #[cfg(not(any(target_os = "windows", target_os = "macos")))]
     {
         "Unknown".to_string()
