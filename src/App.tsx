@@ -8,6 +8,7 @@ import { ActivityTimeline } from "./components/pages/ActivityTimeline";
 import { Applications } from "./components/pages/Applications";
 import { Dashboard } from "./components/pages/Dashboard";
 import { Settings } from "./components/pages/Settings";
+import { ResetPasswordPage } from "./components/pages/ResetPasswordPage";
 import { API_BASE_URL, authClient } from "./lib/auth/auth";
 
 
@@ -51,6 +52,10 @@ function App() {
   
   const session = authClient.useSession();
   const { data: activeOrganization } = authClient.useActiveOrganization();
+
+  // Check if we're on the reset password page
+  const isResetPasswordPage = window.location.pathname === "/reset-password" || 
+                                window.location.search.includes("token=");
 
   useEffect(() => {
     loadData();
@@ -198,7 +203,14 @@ function App() {
           <p className="text-slate-300 text-lg">Loading activity data...</p>
         </div>
       </div>
-    );
+    )
+      //reset password page if token is present
+    if (isResetPasswordPage) {
+      return <ResetPasswordPage />;
+    }
+
+  // Show v>
+    
   }
 
   // Show login modal if not authenticated or no org selected

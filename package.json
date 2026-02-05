@@ -10,10 +10,14 @@
     "tauri": "tauri"
   },
   "dependencies": {
+    "@daveyplate/better-auth-tauri": "^0.1.6",
     "@radix-ui/react-slot": "^1.2.4",
     "@tailwindcss/vite": "^4.1.18",
     "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-deep-link": "~2",
+    "@tauri-apps/plugin-http": "~2",
     "@tauri-apps/plugin-opener": "^2",
+    "@tauri-apps/plugin-os": "~2",
     "@tauri-apps/plugin-sql": "^2.3.1",
     "better-auth": "^1.4.15",
     "class-variance-authority": "^0.7.1",

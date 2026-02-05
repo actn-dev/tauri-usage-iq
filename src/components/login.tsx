@@ -1,12 +1,20 @@
 import { authClient, API_BASE_URL } from "@/lib/auth/auth";
 import { OrganizationSelector } from "./OrganizationSelector";
+import { EmailLoginForm } from "./auth/EmailLoginForm";
+import { SignupForm } from "./auth/SignupForm";
+import { ForgotPassword } from "./auth/ForgotPassword";
 import { useState, useEffect } from "react";
 import { LogIn, LogOut, Building2, Loader2 } from "lucide-react";
+
+type AuthView = "login" | "signup" | "forgot-password";
+type LoginMethod = "google" | "email";
 
 export function Login() {
     const session = authClient.useSession();
     const { data: activeOrganization } = authClient.useActiveOrganization();
     const [showOrgSelector, setShowOrgSelector] = useState(false);
+    const [authView, setAuthView] = useState<AuthView>("login");
+    const [loginMethod, setLoginMethod] = useState<LoginMethod>("google");
 
     // Check if user needs to select organization
     useEffect(() => {
@@ -22,11 +30,28 @@ export function Login() {
     async function handleLogin() {
         await authClient.signIn.social({
             provider: "google",
+            callbackURL: "tauri://localhost",
+        },{
+            onSuccess(context) {
+                const authToken = context.response.headers.get("set-auth-token");
+                if (authToken) {
+                    console.log("📝 Storing bearer token");
+                    localStorage.setItem("bearer_token", authToken);
+                }
+            },
+            onError(error) {
+                console.error("Login error:", error);
+            },
+            onResponse(context) {
+                console.log("Login response:", context.response);
+            },
         });
     }
 
     async function handleLogout() {
         await authClient.signOut();
+        // Clear bearer token on logout
+        localStorage.removeItem("bearer_token");
         setShowOrgSelector(false);
     }
 
@@ -144,19 +169,78 @@ export function Login() {
         <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-8">
             <div className="text-center mb-6">
                 <h2 className="text-2xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                    Sign in to Dilly
+                    {authView === "login" ? "Sign in to Dodily" : authView === "signup" ? "Create Account" : "Reset Password"}
                 </h2>
                 <p className="text-sm text-slate-400">
-                    Sign in to sync your activity data to your organization.
+                    {authView === "login" 
+                        ? "Sign in to sync your activity data to your organization." 
+                        : authView === "signup"
+                        ? "Create an account to start tracking your productivity."
+                        : "Reset your password to regain access to your account."}
                 </p>
             </div>
-            <button
-                onClick={handleLogin}
-                className="w-full px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white rounded-lg font-medium transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20"
-            >
-                <LogIn className="w-5 h-5" />
-                Login with Google
-            </button>
+
+            {authView === "forgot-password" ? (
+                <ForgotPassword onBackToLogin={() => setAuthView("login")} />
+            ) : authView === "signup" ? (
+                <SignupForm 
+                    onSuccess={() => setAuthView("login")}
+                    onLoginClick={() => setAuthView("login")}
+                />
+            ) : (
+                <>
+                    {/* Login Method Tabs */}
+                    <div className="flex gap-2 mb-6">
+                        <button
+                            onClick={() => setLoginMethod("google")}
+                            className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all ${
+                                loginMethod === "google"
+                                    ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
+                                    : "bg-slate-700/50 text-slate-400 border border-slate-700 hover:bg-slate-700"
+                            }`}
+                        >
+                            Google
+                        </button>
+                        <button
+                            onClick={() => setLoginMethod("email")}
+                            className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all ${
+                                loginMethod === "email"
+                                    ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
+                                    : "bg-slate-700/50 text-slate-400 border border-slate-700 hover:bg-slate-700"
+                            }`}
+                        >
+                            Email
+                        </button>
+                    </div>
+
+                    {loginMethod === "email" ? (
+                        <EmailLoginForm 
+                            onForgotPassword={() => setAuthView("forgot-password")}
+                        />
+                    ) : (
+                        <button
+                            onClick={handleLogin}
+                            className="w-full px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white rounded-lg font-medium transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20"
+                        >
+                            <LogIn className="w-5 h-5" />
+                            Login with Google
+                        </button>
+                    )}
+
+                    {/* Sign up link */}
+                    <div className="text-center mt-6 pt-6 border-t border-slate-700">
+                        <p className="text-sm text-slate-400">
+                            Don't have an account?{" "}
+                            <button
+                                onClick={() => setAuthView("signup")}
+                                className="text-blue-400 hover:text-blue-300 font-medium transition-colors"
+                            >
+                                Sign Up
+                            </button>
+                        </p>
+                    </div>
+                </>
+            )}
         </div>
     );
 }

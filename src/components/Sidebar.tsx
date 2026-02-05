@@ -102,6 +102,7 @@ export function Sidebar({
           Dilly
         </h1>
         <p className="text-slate-400 text-xs">Desktop Activity Tracker</p>
+        <p>locatoin: {window.location.href}</p>
         {activeOrganization && (
           <div className="mt-2 p-1.5 bg-green-500/10 border border-green-500/20 rounded">
             <p className="text-xs text-green-400 truncate">
