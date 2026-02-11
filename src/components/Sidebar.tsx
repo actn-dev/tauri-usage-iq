@@ -101,8 +101,8 @@ export function Sidebar({
         <h1 className="text-xl font-bold mb-1 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
           Dilly
         </h1>
-        <p className="text-slate-400 text-xs">Desktop Activity Tracker</p>
-        <p>locatoin: {window.location.href}</p>
+        <p className="text-slate-400 text-xs text-center">Desktop Activity Tracker</p>
+        {/* <p>locatoin: {window.location.href}</p> */}
         {activeOrganization && (
           <div className="mt-2 p-1.5 bg-green-500/10 border border-green-500/20 rounded">
             <p className="text-xs text-green-400 truncate">
@@ -117,11 +117,10 @@ export function Sidebar({
         <button
           onClick={onManualScan}
           disabled={scanning}
-          className={`w-full p-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors ${
-            scanning
-              ? "bg-blue-500/20 cursor-wait"
-              : "bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30"
-          }`}
+          className={`w-full p-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors ${scanning
+            ? "bg-blue-500/20 cursor-wait"
+            : "bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30"
+            }`}
         >
           <RefreshCw
             className={`w-4 h-4 text-blue-400 ${scanning ? "animate-spin" : ""}`}
@@ -134,13 +133,12 @@ export function Sidebar({
         <button
           onClick={onSync}
           disabled={syncing || !activeOrganization}
-          className={`w-full p-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors ${
-            syncing
-              ? "bg-purple-500/20 cursor-wait"
-              : activeOrganization
+          className={`w-full p-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors ${syncing
+            ? "bg-purple-500/20 cursor-wait"
+            : activeOrganization
               ? "bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30"
               : "bg-slate-700 opacity-50 cursor-not-allowed"
-          }`}
+            }`}
         >
           {syncing ? (
             <Cloud className="w-4 h-4 text-purple-400 animate-pulse" />
@@ -168,9 +166,9 @@ export function Sidebar({
       <div className="flex-1 overflow-y-auto">
         {/* Navigation */}
         <div className="p-3 border-b border-slate-700">
-          <h2 className="text-xs font-semibold text-slate-400 mb-2 px-1">
+          {/* <h2 className="text-xs font-semibold text-slate-400 mb-2 px-1">
             NAVIGATION
-          </h2>
+          </h2> */}
           <div className="space-y-1">
             {navItems.map((item) => {
               const Icon = item.icon;
@@ -179,11 +177,10 @@ export function Sidebar({
                 <button
                   key={item.id}
                   onClick={() => onPageChange(item.id)}
-                  className={`w-full p-2.5 rounded-lg flex items-center gap-2 transition-colors ${
-                    isActive
-                      ? "bg-blue-500/20 border border-blue-500/30 text-blue-300"
-                      : "hover:bg-slate-700/50 text-slate-300"
-                  }`}
+                  className={`w-full p-2.5 rounded-lg flex items-center gap-2 transition-colors ${isActive
+                    ? "bg-blue-500/20 border border-blue-500/30 text-blue-300"
+                    : "hover:bg-slate-700/50 text-slate-300"
+                    }`}
                 >
                   <Icon className="w-4 h-4" />
                   <span className="text-sm">{item.label}</span>
@@ -194,7 +191,7 @@ export function Sidebar({
         </div>
 
         {/* Running Apps */}
-        <div className="p-3">
+        {/* <div className="p-3">
           <h2 className="text-xs font-semibold text-slate-400 mb-2 px-1 flex items-center gap-2">
             <Monitor className="w-3 h-3" />
             RUNNING NOW ({runningApps.length})
@@ -213,9 +210,8 @@ export function Sidebar({
                 >
                   <div className="flex items-center gap-2 flex-1 min-w-0">
                     <div
-                      className={`w-2 h-2 rounded-full ${
-                        app.is_active ? "bg-green-400" : "bg-slate-500"
-                      }`}
+                      className={`w-2 h-2 rounded-full ${app.is_active ? "bg-green-400" : "bg-slate-500"
+                        }`}
                     />
                     <span className="text-xs text-slate-300 truncate">
                       {app.app_name || "(unknown)"}
@@ -230,7 +226,7 @@ export function Sidebar({
               ))}
             </div>
           )}
-        </div>
+        </div> */}
       </div>
 
       {/* Footer - Fixed */}

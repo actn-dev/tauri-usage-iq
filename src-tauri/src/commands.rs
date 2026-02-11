@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use std::fs;
 use std::path::PathBuf;
 use tauri::{AppHandle, Manager};
+use tauri_plugin_autostart::ManagerExt;
 
 use crate::activity_tracker::{BrowserSession, HourlyActivity};
 use crate::sync_manager::{self, SyncResult};
@@ -217,4 +218,23 @@ pub async fn get_sync_stats(app: AppHandle) -> Result<serde_json::Value, String>
         "pending_sessions": sessions.len(),
         "total_pending": activities.len() + sessions.len(),
     }))
+}
+
+// Auto-start commands
+#[tauri::command]
+pub async fn is_autostart_enabled(app: AppHandle) -> Result<bool, String> {
+    let manager = app.autolaunch();
+    manager.is_enabled().map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn enable_autostart(app: AppHandle) -> Result<(), String> {
+    let manager = app.autolaunch();
+    manager.enable().map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn disable_autostart(app: AppHandle) -> Result<(), String> {
+    let manager = app.autolaunch();
+    manager.disable().map_err(|e| e.to_string())
 }
