@@ -49,13 +49,13 @@ function App() {
   const [lastSync, setLastSync] = useState<Date | null>(null);
   const [syncError, setSyncError] = useState<string | null>(null);
   const [activePage, setActivePage] = useState("dashboard");
-  
+
   const session = authClient.useSession();
   const { data: activeOrganization } = authClient.useActiveOrganization();
 
   // Check if we're on the reset password page
-  const isResetPasswordPage = window.location.pathname === "/reset-password" || 
-                                window.location.search.includes("token=");
+  const isResetPasswordPage = window.location.pathname === "/reset-password" ||
+    window.location.search.includes("token=");
 
   useEffect(() => {
     loadData();
@@ -100,7 +100,7 @@ function App() {
   async function handleSync() {
     // Use active organization from Better Auth hook
     const orgId = activeOrganization?.id;
-    
+
     if (!orgId || !session.data) {
       setSyncError("Please login and select an organization");
       return;
@@ -138,12 +138,15 @@ function App() {
         osVersion: activity.os_version,
       }));
 
-      // Call server API directly (Better Auth cookies sent automatically)
+      // Get bearer token for authentication
+      const token = localStorage.getItem("bearer_token");
+
+      // Call server API with bearer token authentication
       const response = await fetch(`${API_BASE_URL}/api/desktop/sync`, {
         method: 'POST',
-        credentials: 'include', // Sends Better Auth cookies automatically
         headers: {
           'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` }),
         },
         body: JSON.stringify({
           organizationId: orgId,
@@ -204,13 +207,13 @@ function App() {
         </div>
       </div>
     )
-      //reset password page if token is present
+    //reset password page if token is present
     if (isResetPasswordPage) {
       return <ResetPasswordPage />;
     }
 
-  // Show v>
-    
+    // Show v>
+
   }
 
   // Show login modal if not authenticated or no org selected

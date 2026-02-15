@@ -137,7 +137,7 @@ export function SignupForm({ onSuccess, onLoginClick }: SignupFormProps) {
   async function handleResendOTP() {
     setResending(true);
     setError("");
-    
+
     try {
       await authClient.emailOtp.sendVerificationOtp({
         email: formData.email,
@@ -190,7 +190,7 @@ export function SignupForm({ onSuccess, onLoginClick }: SignupFormProps) {
         )}
 
         <div className="space-y-4">
-          <OTPInput 
+          <OTPInput
             value={otp}
             onChange={setOtp}
             disabled={verifying}
@@ -244,15 +244,15 @@ export function SignupForm({ onSuccess, onLoginClick }: SignupFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
       {error && (
-        <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3">
-          <p className="text-sm text-red-300">{error}</p>
+        <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-2 md:p-3">
+          <p className="text-xs md:text-sm text-red-300">{error}</p>
         </div>
       )}
 
-      <div className="space-y-2">
-        <label htmlFor="name" className="block text-sm font-medium text-slate-300">
+      <div className="space-y-1 md:space-y-2">
+        <label htmlFor="name" className="block text-xs md:text-sm font-medium text-slate-300">
           Full Name
         </label>
         <div className="relative">
@@ -264,13 +264,13 @@ export function SignupForm({ onSuccess, onLoginClick }: SignupFormProps) {
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             placeholder="John Doe"
             required
-            className="w-full pl-10 pr-4 py-2.5 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            className="w-full pl-10 pr-4 py-2 md:py-2.5 bg-slate-900/50 border border-slate-700 rounded-lg text-sm md:text-base text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
           />
         </div>
       </div>
 
-      <div className="space-y-2">
-        <label htmlFor="email" className="block text-sm font-medium text-slate-300">
+      <div className="space-y-1 md:space-y-2">
+        <label htmlFor="email" className="block text-xs md:text-sm font-medium text-slate-300">
           Email
         </label>
         <div className="relative">
@@ -282,13 +282,13 @@ export function SignupForm({ onSuccess, onLoginClick }: SignupFormProps) {
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             placeholder="you@example.com"
             required
-            className="w-full pl-10 pr-4 py-2.5 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            className="w-full pl-10 pr-4 py-2 md:py-2.5 bg-slate-900/50 border border-slate-700 rounded-lg text-sm md:text-base text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
           />
         </div>
       </div>
 
-      <div className="space-y-2">
-        <label htmlFor="password" className="block text-sm font-medium text-slate-300">
+      <div className="space-y-1 md:space-y-2">
+        <label htmlFor="password" className="block text-xs md:text-sm font-medium text-slate-300">
           Password
         </label>
         <div className="relative">
@@ -301,7 +301,7 @@ export function SignupForm({ onSuccess, onLoginClick }: SignupFormProps) {
             placeholder="••••••••"
             required
             minLength={8}
-            className="w-full pl-10 pr-12 py-2.5 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            className="w-full pl-10 pr-12 py-2 md:py-2.5 bg-slate-900/50 border border-slate-700 rounded-lg text-sm md:text-base text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
           />
           <button
             type="button"
@@ -317,15 +317,14 @@ export function SignupForm({ onSuccess, onLoginClick }: SignupFormProps) {
               {[...Array(5)].map((_, i) => (
                 <div
                   key={i}
-                  className={`h-1 flex-1 rounded ${
-                    i < passwordStrength.strength
+                  className={`h-1 flex-1 rounded ${i < passwordStrength.strength
                       ? passwordStrength.strength <= 2
                         ? "bg-red-400"
                         : passwordStrength.strength <= 3
-                        ? "bg-yellow-400"
-                        : "bg-green-400"
+                          ? "bg-yellow-400"
+                          : "bg-green-400"
                       : "bg-slate-700"
-                  }`}
+                    }`}
                 />
               ))}
             </div>
@@ -336,8 +335,8 @@ export function SignupForm({ onSuccess, onLoginClick }: SignupFormProps) {
         )}
       </div>
 
-      <div className="space-y-2">
-        <label htmlFor="confirmPassword" className="block text-sm font-medium text-slate-300">
+      <div className="space-y-1 md:space-y-2">
+        <label htmlFor="confirmPassword" className="block text-xs md:text-sm font-medium text-slate-300">
           Confirm Password
         </label>
         <div className="relative">
@@ -350,7 +349,7 @@ export function SignupForm({ onSuccess, onLoginClick }: SignupFormProps) {
             placeholder="••••••••"
             required
             minLength={8}
-            className="w-full pl-10 pr-12 py-2.5 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            className="w-full pl-10 pr-12 py-2 md:py-2.5 bg-slate-900/50 border border-slate-700 rounded-lg text-sm md:text-base text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
           />
           <button
             type="button"
@@ -368,7 +367,7 @@ export function SignupForm({ onSuccess, onLoginClick }: SignupFormProps) {
       <button
         type="submit"
         disabled={loading}
-        className="w-full px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 disabled:from-slate-700 disabled:to-slate-700 text-white rounded-lg font-medium transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 disabled:shadow-none"
+        className="w-full px-4 py-2 md:py-3 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 disabled:from-slate-700 disabled:to-slate-700 text-white text-sm md:text-base rounded-lg font-medium transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 disabled:shadow-none"
       >
         {loading ? (
           <>
@@ -384,8 +383,8 @@ export function SignupForm({ onSuccess, onLoginClick }: SignupFormProps) {
       </button>
 
       {onLoginClick && (
-        <div className="text-center pt-2">
-          <p className="text-sm text-slate-400">
+        <div className="text-center pt-1 md:pt-2">
+          <p className="text-xs md:text-sm text-slate-400">
             Already have an account?{" "}
             <button
               type="button"

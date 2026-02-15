@@ -5,6 +5,7 @@ import { SignupForm } from "./auth/SignupForm";
 import { ForgotPassword } from "./auth/ForgotPassword";
 import { useState, useEffect } from "react";
 import { LogIn, LogOut, Building2, Loader2 } from "lucide-react";
+import { platform } from "@tauri-apps/plugin-os";
 
 type AuthView = "login" | "signup" | "forgot-password";
 type LoginMethod = "google" | "email";
@@ -14,7 +15,23 @@ export function Login() {
     const { data: activeOrganization } = authClient.useActiveOrganization();
     const [showOrgSelector, setShowOrgSelector] = useState(false);
     const [authView, setAuthView] = useState<AuthView>("login");
+    const [isWindows, setIsWindows] = useState(false);
     const [loginMethod, setLoginMethod] = useState<LoginMethod>("google");
+
+    // Detect OS platform
+    useEffect(() => {
+        async function detectOS() {
+            const platformName = platform();
+            const isWindowsOS = platformName === "windows";
+            setIsWindows(isWindows);
+
+            // If Windows, default to email login
+            if (isWindowsOS) {
+                setLoginMethod("email");
+            }
+        }
+        detectOS();
+    }, []);
 
     // Check if user needs to select organization
     useEffect(() => {
@@ -166,12 +183,12 @@ export function Login() {
     }
 
     return (
-        <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-8">
-            <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+        <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-4 md:p-8">
+            <div className="text-center mb-4 md:mb-6">
+                <h2 className="text-xl md:text-2xl font-bold mb-1 md:mb-2 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
                     {authView === "login" ? "Sign in to Dodily" : authView === "signup" ? "Create Account" : "Reset Password"}
                 </h2>
-                <p className="text-sm text-slate-400">
+                <p className="text-xs md:text-sm text-slate-400">
                     {authView === "login"
                         ? "Sign in to sync your activity data to your organization."
                         : authView === "signup"
@@ -191,20 +208,22 @@ export function Login() {
                 <>
                     {/* Login Method Tabs */}
                     <div className="flex gap-2 mb-6">
-                        <button
-                            onClick={() => setLoginMethod("google")}
-                            className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all ${loginMethod === "google"
+                        {!isWindows && (
+                            <button
+                                onClick={() => setLoginMethod("google")}
+                                className={`flex-1 px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-sm md:text-base font-medium transition-all ${loginMethod === "google"
                                     ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
                                     : "bg-slate-700/50 text-slate-400 border border-slate-700 hover:bg-slate-700"
-                                }`}
-                        >
-                            Google
-                        </button>
+                                    }`}
+                            >
+                                Google
+                            </button>
+                        )}
                         <button
                             onClick={() => setLoginMethod("email")}
-                            className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all ${loginMethod === "email"
-                                    ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
-                                    : "bg-slate-700/50 text-slate-400 border border-slate-700 hover:bg-slate-700"
+                            className={`flex-1 px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-sm md:text-base font-medium transition-all ${loginMethod === "email"
+                                ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
+                                : "bg-slate-700/50 text-slate-400 border border-slate-700 hover:bg-slate-700"
                                 }`}
                         >
                             Email
@@ -215,7 +234,7 @@ export function Login() {
                         <EmailLoginForm
                             onForgotPassword={() => setAuthView("forgot-password")}
                         />
-                    ) : (
+                    ) : !isWindows ? (
                         <button
                             onClick={handleLogin}
                             className="w-full px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white rounded-lg font-medium transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20"
@@ -223,11 +242,11 @@ export function Login() {
                             <LogIn className="w-5 h-5" />
                             Login with Google
                         </button>
-                    )}
+                    ) : null}
 
                     {/* Sign up link */}
-                    <div className="text-center mt-6 pt-6 border-t border-slate-700">
-                        <p className="text-sm text-slate-400">
+                    <div className="text-center mt-4 pt-4 md:mt-6 md:pt-6 border-t border-slate-700">
+                        <p className="text-xs md:text-sm text-slate-400">
                             Don't have an account?{" "}
                             <button
                                 onClick={() => setAuthView("signup")}

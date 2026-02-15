@@ -2,8 +2,8 @@ import { createAuthClient } from "better-auth/react"
 
 import { organizationClient, emailOTPClient } from "better-auth/client/plugins"
 
-// export const API_BASE_URL = 'https://dodily-nextjs.vercel.app';
-export const API_BASE_URL = 'http://192.168.0.200:3000';
+export const API_BASE_URL = 'https://dodily-nextjs.vercel.app';
+// export const API_BASE_URL = 'http://192.168.0.200:3000';
 // export const API_BASE_URL = 'http://localhost:3000';
 export const authClient = createAuthClient({
     /** The base URL of the server (optional if you're using the same domain) */

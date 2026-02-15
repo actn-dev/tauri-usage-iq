@@ -58,15 +58,15 @@ export function EmailLoginForm({ onSuccess, onForgotPassword }: EmailLoginFormPr
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
       {error && (
-        <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3">
-          <p className="text-sm text-red-300">{error}</p>
+        <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-2 md:p-3">
+          <p className="text-xs md:text-sm text-red-300">{error}</p>
         </div>
       )}
 
-      <div className="space-y-2">
-        <label htmlFor="email" className="block text-sm font-medium text-slate-300">
+      <div className="space-y-1 md:space-y-2">
+        <label htmlFor="email" className="block text-xs md:text-sm font-medium text-slate-300">
           Email
         </label>
         <div className="relative">
@@ -78,13 +78,13 @@ export function EmailLoginForm({ onSuccess, onForgotPassword }: EmailLoginFormPr
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@example.com"
             required
-            className="w-full pl-10 pr-4 py-2.5 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            className="w-full pl-10 pr-4 py-2 md:py-2.5 bg-slate-900/50 border border-slate-700 rounded-lg text-sm md:text-base text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
           />
         </div>
       </div>
 
-      <div className="space-y-2">
-        <label htmlFor="password" className="block text-sm font-medium text-slate-300">
+      <div className="space-y-1 md:space-y-2">
+        <label htmlFor="password" className="block text-xs md:text-sm font-medium text-slate-300">
           Password
         </label>
         <div className="relative">
@@ -97,7 +97,7 @@ export function EmailLoginForm({ onSuccess, onForgotPassword }: EmailLoginFormPr
             placeholder="••••••••"
             required
             minLength={8}
-            className="w-full pl-10 pr-12 py-2.5 bg-slate-900/50 border border-slate-700 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            className="w-full pl-10 pr-12 py-2 md:py-2.5 bg-slate-900/50 border border-slate-700 rounded-lg text-sm md:text-base text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
           />
           <button
             type="button"
@@ -119,7 +119,7 @@ export function EmailLoginForm({ onSuccess, onForgotPassword }: EmailLoginFormPr
           />
           <span className="text-sm text-slate-400">Remember me</span>
         </label>
-        
+
         {onForgotPassword && (
           <button
             type="button"
