@@ -209,7 +209,7 @@ impl ActivityTracker {
     }
 
     fn flush_to_disk(&self, app: &AppHandle) {
-        let buffer = self.hourly_buffer.lock().unwrap();
+        let mut buffer = self.hourly_buffer.lock().unwrap();
 
         if buffer.is_empty() {
             return;
@@ -235,7 +235,7 @@ impl ActivityTracker {
             Vec::new()
         };
 
-        // Merge with existing (update or append)
+        // Merge with existing (replace values, not add)
         for new_activity in activities {
             if let Some(existing) = all_activities.iter_mut().find(|a| {
                 a.date == new_activity.date
@@ -243,12 +243,13 @@ impl ActivityTracker {
                     && a.app_name == new_activity.app_name
                     && a.device_id == new_activity.device_id
             }) {
-                // Merge with existing
-                existing.active_time += new_activity.active_time;
-                existing.idle_time += new_activity.idle_time;
-                existing.total_time += new_activity.total_time;
-                existing.focus_count += new_activity.focus_count;
+                // REPLACE values (buffer contains cumulative total for this hour)
+                existing.active_time = new_activity.active_time;
+                existing.idle_time = new_activity.idle_time;
+                existing.total_time = new_activity.total_time;
+                existing.focus_count = new_activity.focus_count;
                 existing.last_seen = new_activity.last_seen;
+                existing.first_seen = new_activity.first_seen.min(existing.first_seen);
 
                 // Merge window titles
                 for title in new_activity.window_titles {
@@ -268,6 +269,16 @@ impl ActivityTracker {
         }
 
         println!("Flushed {} hourly activities to disk", buffer.len());
+        
+        // Clear old hour entries from buffer (keep current hour in memory)
+        let now = current_timestamp();
+        let current_date = timestamp_to_date(now);
+        let current_hour = timestamp_to_hour(now);
+        
+        buffer.retain(|key, activity| {
+            // Keep activities from current hour in buffer for continued tracking
+            activity.date == current_date && activity.hour == current_hour
+        });
     }
 
     pub fn end_session(&self, app: &AppHandle) {

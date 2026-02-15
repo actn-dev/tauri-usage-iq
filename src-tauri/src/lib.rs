@@ -31,6 +31,7 @@ pub fn run() {
             commands::is_autostart_enabled,
             commands::enable_autostart,
             commands::disable_autostart,
+            commands::clear_local_data,
         ])
         .setup(|app| {
             let handle = app.handle().clone();

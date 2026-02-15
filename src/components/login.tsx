@@ -31,7 +31,7 @@ export function Login() {
         await authClient.signIn.social({
             provider: "google",
             callbackURL: "tauri://localhost",
-        },{
+        }, {
             onSuccess(context) {
                 const authToken = context.response.headers.get("set-auth-token");
                 if (authToken) {
@@ -63,7 +63,7 @@ export function Login() {
     function handleChangeOrganization() {
         setShowOrgSelector(true);
     }
-   
+
     if (session.isPending) {
         return (
             <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-12 flex flex-col items-center justify-center">
@@ -172,18 +172,18 @@ export function Login() {
                     {authView === "login" ? "Sign in to Dodily" : authView === "signup" ? "Create Account" : "Reset Password"}
                 </h2>
                 <p className="text-sm text-slate-400">
-                    {authView === "login" 
-                        ? "Sign in to sync your activity data to your organization." 
+                    {authView === "login"
+                        ? "Sign in to sync your activity data to your organization."
                         : authView === "signup"
-                        ? "Create an account to start tracking your productivity."
-                        : "Reset your password to regain access to your account."}
+                            ? "Create an account to start tracking your productivity."
+                            : "Reset your password to regain access to your account."}
                 </p>
             </div>
 
             {authView === "forgot-password" ? (
                 <ForgotPassword onBackToLogin={() => setAuthView("login")} />
             ) : authView === "signup" ? (
-                <SignupForm 
+                <SignupForm
                     onSuccess={() => setAuthView("login")}
                     onLoginClick={() => setAuthView("login")}
                 />
@@ -193,28 +193,26 @@ export function Login() {
                     <div className="flex gap-2 mb-6">
                         <button
                             onClick={() => setLoginMethod("google")}
-                            className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all ${
-                                loginMethod === "google"
+                            className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all ${loginMethod === "google"
                                     ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
                                     : "bg-slate-700/50 text-slate-400 border border-slate-700 hover:bg-slate-700"
-                            }`}
+                                }`}
                         >
                             Google
                         </button>
                         <button
                             onClick={() => setLoginMethod("email")}
-                            className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all ${
-                                loginMethod === "email"
+                            className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all ${loginMethod === "email"
                                     ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
                                     : "bg-slate-700/50 text-slate-400 border border-slate-700 hover:bg-slate-700"
-                            }`}
+                                }`}
                         >
                             Email
                         </button>
                     </div>
 
                     {loginMethod === "email" ? (
-                        <EmailLoginForm 
+                        <EmailLoginForm
                             onForgotPassword={() => setAuthView("forgot-password")}
                         />
                     ) : (

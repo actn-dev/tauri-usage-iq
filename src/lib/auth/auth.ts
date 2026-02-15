@@ -29,6 +29,9 @@ export const authClient = createAuthClient({
                 return token;
             }
         }
+
     },
-    
+    sessionOptions: {
+        refetchOnWindowFocus: false, // Disable automatic refetching on window focus
+    }
 })             

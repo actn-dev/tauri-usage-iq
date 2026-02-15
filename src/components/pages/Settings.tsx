@@ -6,6 +6,8 @@ export function Settings() {
   const [autoStartEnabled, setAutoStartEnabled] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [clearingData, setClearingData] = useState(false);
+  const [clearSuccess, setClearSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     checkAutoStartStatus();
@@ -36,6 +38,26 @@ export function Settings() {
     } catch (err) {
       console.error("Failed to toggle autostart:", err);
       setError(`Failed to ${autoStartEnabled ? 'disable' : 'enable'} autostart`);
+    }
+  };
+
+  const handleClearData = async () => {
+    if (!confirm("Are you sure you want to clear all local activity data? The app will close automatically. This cannot be undone.")) {
+      return;
+    }
+
+    setClearingData(true);
+    setClearSuccess(null);
+    setError(null);
+
+    try {
+      const result = await invoke<string>("clear_local_data");
+      setClearSuccess(`${result} - App will close in a moment...`);
+      // App will automatically exit in 1.5 seconds from the backend
+    } catch (err) {
+      console.error("Failed to clear data:", err);
+      setError("Failed to clear local data");
+      setClearingData(false);
     }
   };
 
@@ -215,8 +237,21 @@ export function Settings() {
             </div>
           </div>
         </div>
-
-        {/* Privacy Settings */}
+        {clearSuccess && (
+          <div className="p-3 bg-green-500/10 border border-green-500/20 rounded-lg text-green-400 text-sm">
+            ✓ {clearSuccess}
+          </div>
+        )}
+        <button
+          onClick={handleClearData}
+          disabled={clearingData}
+          className="w-full px-4 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded-lg transition-colors text-sm text-red-400 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {clearingData ? "Clearing..." : "Clear Local Data"}
+        </button>
+        <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-xs text-yellow-400">
+          ⚠️ Use this to reset if you see incorrect time counts. The app will close automatically - just restart it to begin fresh tracking.
+        </div>
         <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6">
           <div className="flex items-center gap-3 mb-4">
             <Shield className="w-5 h-5 text-green-400" />
@@ -248,6 +283,6 @@ export function Settings() {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 }

@@ -85,7 +85,7 @@ export function ForgotPassword({ onBackToLogin }: ForgotPasswordProps) {
   async function handleResendOTP() {
     setResending(true);
     setError("");
-    
+
     try {
       await authClient.emailOtp.sendVerificationOtp({
         type: "forget-password",
@@ -151,7 +151,7 @@ export function ForgotPassword({ onBackToLogin }: ForgotPasswordProps) {
             <label className="block text-sm font-medium text-slate-300 mb-2">
               Verification Code
             </label>
-            <OTPInput 
+            <OTPInput
               value={otp}
               onChange={setOtp}
               disabled={verifying}
@@ -253,7 +253,7 @@ export function ForgotPassword({ onBackToLogin }: ForgotPasswordProps) {
         <h3 className="text-xl font-semibold text-slate-200 mb-2">Forgot Password?</h3>
         <p className="text-sm text-slate-400">
           Enter your email address and we'll send you a link to reset your password.
-        </p>code
+        </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">

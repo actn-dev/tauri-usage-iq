@@ -238,3 +238,73 @@ pub async fn disable_autostart(app: AppHandle) -> Result<(), String> {
     let manager = app.autolaunch();
     manager.disable().map_err(|e| e.to_string())
 }
+
+// Data management commands
+#[tauri::command]
+pub async fn clear_local_data(app: AppHandle) -> Result<String, String> {
+    let hourly_path = get_hourly_activities_path(&app);
+    let sessions_path = get_sessions_path(&app);
+    
+    println!("Attempting to clear data...");
+    println!("Hourly path: {:?}", hourly_path);
+    println!("Sessions path: {:?}", sessions_path);
+    
+    let mut cleared = Vec::new();
+    let mut errors = Vec::new();
+    
+    // Clear hourly activities
+    if hourly_path.exists() {
+        match fs::remove_file(&hourly_path) {
+            Ok(_) => {
+                cleared.push("hourly_activities");
+                println!("Deleted hourly_activities.json");
+            }
+            Err(e) => {
+                errors.push(format!("hourly: {}", e));
+                println!("Failed to delete hourly_activities.json: {}", e);
+            }
+        }
+    } else {
+        println!("Hourly activities file doesn't exist");
+    }
+    
+    // Clear sessions
+    if sessions_path.exists() {
+        match fs::remove_file(&sessions_path) {
+            Ok(_) => {
+                cleared.push("sessions");
+                println!("Deleted sessions.json");
+            }
+            Err(e) => {
+                errors.push(format!("sessions: {}", e));
+                println!("Failed to delete sessions.json: {}", e);
+            }
+        }
+    } else {
+        println!("Sessions file doesn't exist");
+    }
+    
+    if !errors.is_empty() {
+        return Err(format!("Failed to clear: {}", errors.join(", ")));
+    }
+    
+    let message = if cleared.is_empty() {
+        "No data to clear".to_string()
+    } else {
+        format!("Cleared: {}", cleared.join(", "))
+    };
+    
+    println!("Clear completed: {}", message);
+    println!("Will exit in 1.5 seconds...");
+    
+    // Exit the app after a short delay
+    let app_handle = app.clone();
+    tokio::spawn(async move {
+        tokio::time::sleep(tokio::time::Duration::from_millis(1500)).await;
+        println!("Exiting app now...");
+        std::process::exit(0);
+    });
+    
+    Ok(message)
+}
+
